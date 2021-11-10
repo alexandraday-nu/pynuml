@@ -61,7 +61,6 @@ def panoptic_label(part):
           or part.start_process == b'muPlusCaptureAtRest' or part.start_process == b'Decay'):
           sl = label.michel.value
           slc = label.michel.value
-
         elif part.start_process == b'conv':
           if part.momentum >=0.02:
             sl = label.shower.value
@@ -69,21 +68,7 @@ def panoptic_label(part):
           else:
             sl = label.diffuse.value
             slc = label.diffuse.value
-        elif part.end_process == b'conv':
-          if part.momentum >= 0.02:
-            sl = label.shower.value
-            slc = label.shower.value
-          else:
-            sl = label.diffuse.value
-            slc = label.diffuse.value
         elif part.start_process == b'compt':
-          if part.momentum >= 0.02:
-            sl = label.shower.value
-            slc = label.shower.value
-          else:
-            sl = label.diffuse.value
-            slc = label.diffuse.value
-        elif part.end_process == b'compt':
           if part.momentum >= 0.02:
             sl = label.shower.value
             slc = label.shower.value
@@ -117,27 +102,7 @@ def panoptic_label(part):
           or part.end_process == b'FastScintillation':
           sl = label.diffuse.value
           slc = label.diffuse.value
-        else:
-          raise Exception('electron failed to be labeled as expected')
-
-        return sl, slc
-
-      def gamma_labeler(part, parent_type):
-        if part.start_process == b'conv':
-          if part.momentum >=0.02:
-            sl = label.shower.value
-            slc = label.shower.value
-          else:
-            sl = label.diffuse.value
-            slc = label.diffuse.value
         elif part.end_process == b'conv':
-          if part.momentum >= 0.02:
-            sl = label.shower.value
-            slc = label.shower.value
-          else:
-            sl = label.diffuse.value
-            slc = label.diffuse.value
-        elif part.start_process == b'compt':
           if part.momentum >= 0.02:
             sl = label.shower.value
             slc = label.shower.value
@@ -151,10 +116,44 @@ def panoptic_label(part):
           else:
             sl = label.diffuse.value
             slc = label.diffuse.value
+        else:
+          raise Exception('electron failed to be labeled as expected')
+
+        return sl, slc
+
+      def gamma_labeler(part, parent_type):
+        if part.start_process == b'conv':
+          if part.momentum >=0.02:
+            sl = label.shower.value
+            slc = label.shower.value
+          else:
+            sl = label.diffuse.value
+            slc = label.diffuse.value
+        elif part.start_process == b'compt':
+          if part.momentum >= 0.02:
+            sl = label.shower.value
+            slc = label.shower.value
+          else:
+            sl = label.diffuse.value
+            slc = label.diffuse.value
         elif part.start_process == b'eBrem' or part.end_process == b'phot' \
           or part.end_process == b'photonNuclear':
           sl = label.diffuse.value
           slc = None
+        elif part.end_process == b'conv':
+          if part.momentum >= 0.02:
+            sl = label.shower.value
+            slc = label.shower.value
+          else:
+            sl = label.diffuse.value
+            slc = label.diffuse.value
+        elif part.end_process == b'compt':
+          if part.momentum >= 0.02:
+            sl = label.shower.value
+            slc = label.shower.value
+          else:
+            sl = label.diffuse.value
+            slc = label.diffuse.value
         else:
           raise Exception('gamma interaction failed to be labeled as expected')
         return sl, slc
