@@ -102,6 +102,7 @@ def process_event_singleplane(event_id, evt, l, e, lower_bnd=20, **edge_args):
   return ret
 
 def process_event(event_id, evt, l, e, lower_bnd=20, **edge_args):
+  #print("evt is: ", type(evt))
   """Process an event into graphs"""
   # skip any events with no simulated hits
 

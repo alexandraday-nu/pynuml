@@ -163,7 +163,8 @@ def i(part, particles, sl):
     if sl == label.shower.value: ilc = il
   return il, ilc
 
-def walk(part, particles, depth, sl, il):
+def walk(part, particles, depth, sl, il, count):
+  count += 1
   if sl is not None: slc = sl
   else: sl, slc = s(part, particles)
 
@@ -180,15 +181,26 @@ def walk(part, particles, depth, sl, il):
             "instance_label": il } ]
 
   for _, row in particles[(part.g4_id==particles.parent_id)].iterrows():
-    ret += walk(row, particles, depth+1, slc, ilc)
-  return ret
+    ret_val, count = walk(row, particles, depth+1, slc, ilc, count)
+    ret += ret_val
+  return ret, count
 
-def panoptic_label(part):
+def panoptic_label(part): #part is l(evt[particle_table]) equivalent - check
   ret = []
   part = part.set_index("g4_id", drop=False)
   primaries = part[(part.parent_id==0)]
+  count = 0
+  # for each type in the particle table, how many calls
+  # get the type for each particle
+  # [particle_table][type]
+  # size [type] will be used to accumulate these - init in other file
+  # make sure they're unique
   for _, primary in primaries.iterrows():
-    ret += walk(primary, part, 0, None, None)
+    ret_val, count = walk(primary, part, 0, None, None, count)
+    ret += ret_val
+  #print("part = ", part)
+  #print("primaries=", primaries)
+  #print("walk count=", count)
   import pandas as pd
   labels = pd.DataFrame.from_dict(ret)
   instances = { val: i for i, val in enumerate(labels[(labels.instance_label>=0)].instance_label.unique()) }
@@ -198,7 +210,7 @@ def panoptic_label(part):
     return instances[row.instance_label]
 
   labels["instance_label"] = labels.apply(alias_instance, args=[instances], axis="columns")
-  return labels
+  return labels #make sure this returns the correct value and particle, etc. 
 
 def semantic_label(part):
   return panoptic_label(part).drop("instance_label", axis="columns")
